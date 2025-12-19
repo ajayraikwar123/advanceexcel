@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advance Excel MOCK TEST</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #e8f0ff;
+      color: #222;
+    }
+    .exam-container {
+      width: 85%;
+      max-width: 900px;
+      background: #fff;
+      margin: 40px auto;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      overflow: hidden;
+      animation: fadeIn 0.5s ease;
+      position: relative;
+    }
+    .header {
+      background-color: #003d99;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 22px;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .exam-info {
+      text-align: right;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .timer-bar {
+      background: #f5f5f5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid #ddd;
+    }
+    .question-area {
+      padding: 25px 40px;
+      min-height: 300px;
+    }
+    .question {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 12px;
+      background: #f9f9f9;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .option:hover {
+      background: #e6f0ff;
+    }
+    .option.selected {
+      background: #007bff;
+      color: #fff;
+      border-color: #007bff;
+    }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f3f3f3;
+      padding: 15px 25px;
+      border-top: 1px solid #ddd;
+    }
+    .footer button {
+      border: none;
+      padding: 10px 20px;
+      font-weight: 500;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #007bff;
+      color: #fff;
+    }
+    .btn-gray {
+      background: #ccc;
+    }
+    .btn-outline {
+      background: #fff;
+      border: 1px solid #888;
+    }
+    .btn-primary:hover,
+    .btn-gray:hover,
+    .btn-outline:hover {
+      opacity: 0.9;
+    }
+    .start-screen {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .start-screen input {
+      padding: 10px;
+      font-size: 16px;
+      width: 250px;
+      margin-top: 15px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+    }
+    .start-screen button {
+      margin-top: 20px;
+      padding: 10px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .result {
+      padding: 30px 40px;
+      text-align: left;
+    }
+    .result h3 {
+      color: #003d99;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .answer-card {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+    .answer-card.correct {
+      border-left: 5px solid #28a745;
+      background: #e9f9ee;
+    }
+    .answer-card.wrong {
+      border-left: 5px solid #dc3545;
+      background: #fde8e8;
+    }
+    .answer-label {
+      font-weight: 500;
+    }
+    .answer-correct {
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    /* Loader Styles */
+    .loader-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      color: #003d99;
+      z-index: 9999;
+      flex-direction: column;
+    }
+    .loader-spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #003d99;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Start Screen -->
+  <div id="startScreen" class="start-screen">
+    <h2>WELCOME TO VIDYA ADVANCE EXCEL MOCK TEST</h2>
+    <p>Enter your full name to begin the test:</p>
+    <input type="text" id="studentName" placeholder="Enter your name" required>
+    <br>
+    <button onclick="startExam()">Start Exam</button>
+  </div>
+
+  <!-- Exam Screen -->
+  <div class="exam-container" id="examContainer" style="display:none;">
+    <!-- Loader -->
+    <div class="loader-overlay" id="loader" style="display:none;">
+      <div class="loader-spinner"></div>
+      <div>Please wait...</div>
+    </div>
+
+    <div class="header">
+      <div class="logo">ADVANCE EXCEL MOCK TEST</div>
+      <div class="exam-info">
+        <div><strong>Tracking ID:</strong> T24325643643</div>
+        <div><strong>Name:</strong> <span id="displayName"></span></div>
+        <div><strong>Assessment:</strong> Advance Excel</div>
+      </div>
+    </div>
+
+    <div class="timer-bar">
+      <div id="question-count">Question 1</div>
+      <div>⏱ <span id="timer">30:00</span></div>
+      <div>Advance Excel, Word</div>
+    </div>
+
+    <div class="question-area" id="question-area"></div>
+
+    <div class="footer">
+      <button class="btn-outline" id="resetBtn">Reset</button>
+      <div>
+        <button class="btn-gray" id="prevBtn">Previous</button>
+        <button class="btn-primary" id="nextBtn">Next</button>
+        <button class="btn-primary" id="submitBtn" style="display:none;">Submit Exam</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycby3yM5olhwcQpTiZhjKMsS6u4KkhI3gnbBeC1eXnbUmP1PYSn8_Cnb8wpBFewa6O46A/exec";
+
+    let questions = [];
+    let current = 0;
+    let userAnswers = [];
+    let timeLeft = 30 * 60; // 30 minutes
+    let timer;
+
+    async function loadQuestions() {
+      document.getElementById("loader").style.display = "flex"; // show loader
+      try {
+        const res = await fetch(SHEET_URL);
+        questions = await res.json();
+      } catch (err) {
+        alert("Failed to load questions. Try again.");
+        console.error(err);
+        return;
+      } finally {
+        document.getElementById("loader").style.display = "none"; // hide loader
+      }
+      loadQuestion();
+      startTimer(); // start timer after questions loaded
+    }
+
+    function startExam() {
+      const name = document.getElementById("studentName").value.trim();
+      if (!name) return alert("Please enter your name!");
+
+      document.getElementById("displayName").innerText = name;
+      document.getElementById("startScreen").style.display = "none";
+      document.getElementById("examContainer").style.display = "block";
+
+      loadQuestions(); // timer starts after questions loaded
+    }
+
+    function startTimer() {
+      timer = setInterval(() => {
+        timeLeft--;
+        const m = Math.floor(timeLeft / 60);
+        const s = timeLeft % 60;
+        document.getElementById("timer").textContent =
+          `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          submitExam();
+        }
+      }, 1000);
+    }
+
+    function loadQuestion() {
+      const q = questions[current];
+      document.getElementById("question-count").textContent =
+        `Question ${current + 1} of ${questions.length}`;
+
+      let html = `<div class='question'>${q.question}</div><div class='options'>`;
+
+      for (const opt in q.options) {
+        const selected = userAnswers[current] === opt ? "selected" : "";
+        html += `<div class='option ${selected}' onclick="selectOption('${opt}', this)">${opt}. ${q.options[opt]}</div>`;
+      }
+
+      html += "</div>";
+
+      document.getElementById("question-area").innerHTML = html;
+
+      document.getElementById("prevBtn").disabled = current === 0;
+      document.getElementById("nextBtn").style.display = current === questions.length - 1 ? "none" : "inline-block";
+      document.getElementById("submitBtn").style.display = current === questions.length - 1 ? "inline-block" : "none";
+    }
+
+    function selectOption(opt, el) {
+      userAnswers[current] = opt;
+      document.querySelectorAll(".option").forEach(o =>
+        o.classList.remove("selected")
+      );
+      el.classList.add("selected");
+    }
+
+    document.getElementById("nextBtn").onclick = () => {
+      if (current < questions.length - 1) {
+        current++;
+        loadQuestion();
+      }
+    };
+
+    document.getElementById("prevBtn").onclick = () => {
+      if (current > 0) {
+        current--;
+        loadQuestion();
+      }
+    };
+
+    document.getElementById("resetBtn").onclick = () => {
+      userAnswers[current] = null;
+      loadQuestion();
+    };
+
+    document.getElementById("submitBtn").onclick = submitExam;
+
+    function submitExam() {
+      clearInterval(timer);
+
+      let score = 0;
+
+      questions.forEach((q, i) => {
+        if (userAnswers[i] === q.correct) score++;
+      });
+
+      let html = `
+      <div class="result">
+        <h3>Exam Submitted!</h3>
+        <p><strong>${document.getElementById("displayName").innerText}</strong><br>
+        Your Score: ${score}/${questions.length}</p><hr>`;
+
+      questions.forEach((q, i) => {
+        const user = userAnswers[i] || "Not Answered";
+        const isCorrect = user === q.correct;
+
+        html += `
+        <div class="answer-card ${isCorrect ? "correct" : "wrong"}">
+          <div class="answer-label"><strong>Q${i + 1}.</strong> ${q.question}</div>
+          <div><strong>Your Answer:</strong> ${user} - ${q.options[user] || "—"}</div>
+          <div><strong>Correct Answer:</strong> 
+          <span class="answer-correct">${q.correct}</span> - ${q.options[q.correct]}</div>
+        </div>`;
+      });
+
+      html += "</div>";
+
+      document.getElementById("examContainer").innerHTML = html;
+    }
+  </script>
+</body>
+</html>
