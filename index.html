@@ -11,6 +11,7 @@
       font-family: "Segoe UI", sans-serif;
       background-color: #e8f0ff;
       color: #222;
+      padding-bottom: 50px;
     }
     .exam-container {
       width: 85%;
@@ -131,7 +132,6 @@
       color: #fff;
       cursor: pointer;
     }
-
     .result {
       padding: 30px 40px;
       text-align: left;
@@ -164,8 +164,6 @@
       color: #007bff;
       font-weight: bold;
     }
-
-    /* Loader Styles */
     .loader-overlay {
       position: absolute;
       top: 0;
@@ -194,8 +192,23 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    /* SITE FOOTER */
+    .site-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #003d99;
+      color: #fff;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      z-index: 1000;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Start Screen -->
@@ -209,7 +222,6 @@
 
   <!-- Exam Screen -->
   <div class="exam-container" id="examContainer" style="display:none;">
-    <!-- Loader -->
     <div class="loader-overlay" id="loader" style="display:none;">
       <div class="loader-spinner"></div>
       <div>Please wait...</div>
@@ -242,40 +254,40 @@
     </div>
   </div>
 
+  <!-- SITE FOOTER TEXT -->
+  <footer class="site-footer">
+    This website is managed by <strong>Ajay Raikwar</strong> ©2025
+  </footer>
+
   <script>
     const SHEET_URL = "https://script.google.com/macros/s/AKfycby3yM5olhwcQpTiZhjKMsS6u4KkhI3gnbBeC1eXnbUmP1PYSn8_Cnb8wpBFewa6O46A/exec";
-
     let questions = [];
     let current = 0;
     let userAnswers = [];
-    let timeLeft = 30 * 60; // 30 minutes
+    let timeLeft = 30 * 60;
     let timer;
 
     async function loadQuestions() {
-      document.getElementById("loader").style.display = "flex"; // show loader
+      document.getElementById("loader").style.display = "flex";
       try {
         const res = await fetch(SHEET_URL);
         questions = await res.json();
       } catch (err) {
-        alert("Failed to load questions. Try again.");
-        console.error(err);
-        return;
+        alert("Failed to load questions.");
       } finally {
-        document.getElementById("loader").style.display = "none"; // hide loader
+        document.getElementById("loader").style.display = "none";
       }
       loadQuestion();
-      startTimer(); // start timer after questions loaded
+      startTimer();
     }
 
     function startExam() {
       const name = document.getElementById("studentName").value.trim();
       if (!name) return alert("Please enter your name!");
-
       document.getElementById("displayName").innerText = name;
       document.getElementById("startScreen").style.display = "none";
       document.getElementById("examContainer").style.display = "block";
-
-      loadQuestions(); // timer starts after questions loaded
+      loadQuestions();
     }
 
     function startTimer() {
@@ -285,11 +297,7 @@
         const s = timeLeft % 60;
         document.getElementById("timer").textContent =
           `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          submitExam();
-        }
+        if (timeLeft <= 0) submitExam();
       }, 1000);
     }
 
@@ -297,18 +305,13 @@
       const q = questions[current];
       document.getElementById("question-count").textContent =
         `Question ${current + 1} of ${questions.length}`;
-
       let html = `<div class='question'>${q.question}</div><div class='options'>`;
-
       for (const opt in q.options) {
         const selected = userAnswers[current] === opt ? "selected" : "";
         html += `<div class='option ${selected}' onclick="selectOption('${opt}', this)">${opt}. ${q.options[opt]}</div>`;
       }
-
       html += "</div>";
-
       document.getElementById("question-area").innerHTML = html;
-
       document.getElementById("prevBtn").disabled = current === 0;
       document.getElementById("nextBtn").style.display = current === questions.length - 1 ? "none" : "inline-block";
       document.getElementById("submitBtn").style.display = current === questions.length - 1 ? "inline-block" : "none";
@@ -316,65 +319,35 @@
 
     function selectOption(opt, el) {
       userAnswers[current] = opt;
-      document.querySelectorAll(".option").forEach(o =>
-        o.classList.remove("selected")
-      );
+      document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
       el.classList.add("selected");
     }
 
-    document.getElementById("nextBtn").onclick = () => {
-      if (current < questions.length - 1) {
-        current++;
-        loadQuestion();
-      }
-    };
-
-    document.getElementById("prevBtn").onclick = () => {
-      if (current > 0) {
-        current--;
-        loadQuestion();
-      }
-    };
-
-    document.getElementById("resetBtn").onclick = () => {
-      userAnswers[current] = null;
-      loadQuestion();
-    };
-
+    document.getElementById("nextBtn").onclick = () => { if (current < questions.length - 1) { current++; loadQuestion(); } };
+    document.getElementById("prevBtn").onclick = () => { if (current > 0) { current--; loadQuestion(); } };
+    document.getElementById("resetBtn").onclick = () => { userAnswers[current] = null; loadQuestion(); };
     document.getElementById("submitBtn").onclick = submitExam;
 
     function submitExam() {
       clearInterval(timer);
-
       let score = 0;
-
-      questions.forEach((q, i) => {
-        if (userAnswers[i] === q.correct) score++;
-      });
-
-      let html = `
-      <div class="result">
-        <h3>Exam Submitted!</h3>
+      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) score++; });
+      let html = `<div class="result"><h3>Exam Submitted!</h3>
         <p><strong>${document.getElementById("displayName").innerText}</strong><br>
         Your Score: ${score}/${questions.length}</p><hr>`;
-
       questions.forEach((q, i) => {
         const user = userAnswers[i] || "Not Answered";
         const isCorrect = user === q.correct;
-
-        html += `
-        <div class="answer-card ${isCorrect ? "correct" : "wrong"}">
-          <div class="answer-label"><strong>Q${i + 1}.</strong> ${q.question}</div>
-          <div><strong>Your Answer:</strong> ${user} - ${q.options[user] || "—"}</div>
-          <div><strong>Correct Answer:</strong> 
-          <span class="answer-correct">${q.correct}</span> - ${q.options[q.correct]}</div>
+        html += `<div class="answer-card ${isCorrect ? "correct" : "wrong"}">
+          <div><strong>Q${i + 1}.</strong> ${q.question}</div>
+          <div><strong>Your Answer:</strong> ${user}</div>
+          <div><strong>Correct Answer:</strong> ${q.correct}</div>
         </div>`;
       });
-
       html += "</div>";
-
       document.getElementById("examContainer").innerHTML = html;
     }
   </script>
+
 </body>
 </html>
