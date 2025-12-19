@@ -157,9 +157,6 @@
       border-left: 5px solid #dc3545;
       background: #fde8e8;
     }
-    .answer-label {
-      font-weight: 500;
-    }
     .answer-correct {
       color: #007bff;
       font-weight: bold;
@@ -193,7 +190,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* SITE FOOTER */
     .site-footer {
       position: fixed;
       bottom: 0;
@@ -264,7 +260,6 @@
     </div>
   </div>
 
-  <!-- SITE FOOTER TEXT -->
   <footer class="site-footer">
     This website is managed by <strong>Ajay Raikwar</strong> ©2025
   </footer>
@@ -341,26 +336,31 @@
     function submitExam() {
       clearInterval(timer);
       let score = 0;
-      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) score++; });
-      let html = `<div class="result"><h3>Exam Submitted!</h3>
-        <p><strong>${document.getElementById("displayName").innerText}</strong><br>
-        Your Score: ${score}/${questions.length}</p><hr>`;
+      questions.forEach((q, i) => {
+        if (userAnswers[i] === q.correct) score++;
+      });
+
+      let html = `<div class="result">
+          <h3>Exam Submitted!</h3>
+          <p><strong>${document.getElementById("displayName").innerText}</strong><br>
+          Your Score: ${score}/${questions.length}</p>
+          <hr>`;
+
       questions.forEach((q, i) => {
         const user = userAnswers[i] || "Not Answered";
         const isCorrect = user === q.correct;
+
         html += `<div class="answer-card ${isCorrect ? "correct" : "wrong"}">
-          <div><strong>Q${i + 1}.</strong> ${q.question}</div>
-          <div><strong>Your Answer:</strong> ${user}</div>
-          <div><strong>Correct Answer:</strong> ${q.correct}</div>
-        </div>`;
+            <div><strong>Q${i + 1}.</strong> ${q.question}</div>
+            <div><strong>Your Answer:</strong> ${user} ${user !== "Not Answered" ? ". " + q.options[user] : ""}</div>
+            <div><strong>Correct Answer:</strong> <span class="answer-correct">${q.correct}. ${q.options[q.correct]}</span></div>
+          </div>`;
       });
-      html += "</div>";
+
+      html += `</div>`;
       document.getElementById("examContainer").innerHTML = html;
     }
   </script>
 
 </body>
 </html>
-
-
-
